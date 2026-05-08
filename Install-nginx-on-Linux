@@ -1,316 +1,109 @@
-# How to Install NGINX on Amazon Linux Using User Data Script
+---
 
-## Step by Step
+# ✅ **How to Launch an EC2 Instance (Amazon Linux 2 AMI) with User Data Script**
 
-We will launch an EC2 instance with **Amazon Linux** and automatically install NGINX using **User Data Script**.
-
-After launch:
-
-```text id="3r9q7i"
-EC2 starts
-→ User Data runs automatically
-→ NGINX installs
-→ Web server starts
-→ Website accessible in browser
-```
+Below are the exact steps you will follow in the AWS Console.
 
 ---
 
-# 🔹 What is Amazon Linux?
-
-Amazon Linux is AWS’s own Linux operating system optimized for EC2.
-
-Popular versions:
-
-✅ Amazon Linux 2
-✅ Amazon Linux 2023 (latest)
-
----
-
-# 🔹 Difference from Ubuntu
-
-| Ubuntu       | Amazon Linux |
-| ------------ | ------------ |
-| apt          | yum / dnf    |
-| ubuntu user  | ec2-user     |
-| Debian based | RedHat based |
-
----
-
-# 🔹 Step 1: Open EC2 Console
+# **STEP 1: Login to AWS Console**
 
 Go to:
 
-AWS Console → EC2 → Instances
-
-Click:
-
-```text id="2n2w8k"
-Launch Instance
-```
+[https://console.aws.amazon.com](https://console.aws.amazon.com/)
 
 ---
 
-# 🔹 Step 2: Configure Instance
+# **STEP 2: Go to EC2 Dashboard**
 
-## Name
-
-Example:
-
-```text id="g6phwp"
-amazon-linux-nginx
-```
+Search **EC2** → click **Launch instance**.
 
 ---
 
-## Choose AMI
+# **STEP 3: Choose an AMI**
+
+In **Application & OS Images**, select:
+
+### **Amazon Linux 2 AMI (free tier eligible)**
+
+— 64-bit (x86)
+
+---
+
+# **STEP 4: Choose Instance Type**
 
 Select:
 
-```text id="7m37qv"
-Amazon Linux 2023 AMI
-```
-
-OR Amazon Linux 2.
+### **t2.micro** (Free Tier)
 
 ---
 
-## Instance Type
+# **STEP 5: Configure Key Pair**
 
-```text id="uq8m04"
-t2.micro
-```
-
-(Free tier eligible)
+Choose an existing key pair or create a new one (to SSH later).
 
 ---
 
-## Key Pair
+# **STEP 6: Configure Network (default is fine)**
 
-Choose existing OR create new.
-
-Example:
-
-```text id="6o6wqg"
-my-key.pem
-```
-
-Download key.
+- VPC: default
+- Subnet: choose any
+- Auto-assign public IP: **Enable**
+- Security Group:
+    - Allow **SSH (22)** from My IP
 
 ---
 
-# 🔹 Step 3: Configure Security Group
+# **STEP 7: Add User Data Script**
 
-Allow:
+Scroll down to **Advanced details** → **User data**.
 
-| Type | Port |
-| ---- | ---- |
-| SSH  | 22   |
-| HTTP | 80   |
-
-Important for browser access.
+Paste your script here (BASIC SAMPLE below).
 
 ---
 
-# 🔹 Step 4: Add User Data Script
+## ✔ **Sample User Data Script (Amazon Linux 2)**
 
-Scroll down:
+This script simply updates the instance and installs Apache (NO Python/Node files):
 
-```text id="j5iyv7"
-Advanced Details
 ```
-
-Find:
-
-```text id="o4zzul"
-User Data
-```
-
-Paste this script:
-
-# Amazon Linux 2023
-
-```bash id="lzt06f"
 #!/bin/bash
-
-dnf update -y
-dnf install nginx -y
-
-systemctl start nginx
-systemctl enable nginx
-
-echo "<h1>NGINX Installed on Amazon Linux</h1>" > /usr/share/nginx/html/index.html
-```
-
----
-
-# 🔹 For Amazon Linux 2
-
-Use:
-
-```bash id="8k7z4x"
-#!/bin/bash
-
 yum update -y
-amazon-linux-extras install nginx1 -y
+yum install -y httpd
+systemctl enable httpd
+systemctl start httpd
 
-systemctl start nginx
-systemctl enable nginx
+echo "<h1>Welcome to Sunny's EC2 Instance With Linux AMI</h1>" > /var/www/html/index.html
 
-echo "<h1>NGINX Installed on Amazon Linux 2</h1>" > /usr/share/nginx/html/index.html
 ```
+
+This will:
+
+✔ Update server
+
+✔ Install Apache
+
+✔ Start web server
+
+✔ Add a simple HTML message
 
 ---
 
-# 🔹 What This Script Does
+# **STEP 8: Launch Instance**
 
-## Shebang
-
-```bash id="v9r4vg"
-#!/bin/bash
-```
-
-Runs script using bash shell.
+Click **Launch Instance**.
 
 ---
 
-## Update Packages
+# **STEP 9: Test Your EC2**
 
-Amazon Linux 2023:
+After instance starts → copy **Public IPv4 address** → open in browser:
 
-```bash id="vdr5to"
-dnf update -y
+```
+http://YOUR_PUBLIC_IP
+
 ```
 
-Amazon Linux 2:
+You will see:
 
-```bash id="r7dncc"
-yum update -y
-```
-
----
-
-## Install NGINX
-
-Amazon Linux 2023:
-
-```bash id="s1mjlwm"
-dnf install nginx -y
-```
-
-Amazon Linux 2:
-
-```bash id="xjlwm1"
-amazon-linux-extras install nginx1 -y
-```
-
----
-
-## Start NGINX
-
-```bash id="pszyd1"
-systemctl start nginx
-```
-
-Starts web server.
-
----
-
-## Enable Auto Start
-
-```bash id="xv24r2"
-systemctl enable nginx
-```
-
-NGINX starts after reboot automatically.
-
----
-
-## Create Custom HTML Page
-
-```bash id="t4ljq5"
-echo "<h1>NGINX Installed on Amazon Linux</h1>" > /usr/share/nginx/html/index.html
-```
-
-Creates webpage.
-
----
-
-# 🔹 Step 5: Launch Instance
-
-Click:
-
-```text id="t7l45g"
-Launch Instance
-```
-
-Wait 1–2 minutes.
-
----
-
-# 🔹 Step 6: Access Website
-
-Copy EC2 public IP:
-
-Example:
-
-```text id="kll48r"
-http://54.xx.xx.xx
-```
-
-Browser output:
-
-```text id="qrf3kg"
-NGINX Installed on Amazon Linux
-```
-
-Success ✅
-
----
-
-# 🔹 Step 7: Connect Using SSH
-
-Amazon Linux username:
-
-```text id="mvv7x4"
-ec2-user
-```
-
-Connect:
-
-```bash id="k9zq9y"
-ssh -i my-key.pem ec2-user@PUBLIC-IP
-```
-
----
-
-# 🔹 Step 8: Verify NGINX
-
-Check status:
-
-```bash id="k7vd7m"
-systemctl status nginx
-```
-
----
-
-# 🔹 Step 9: Check User Data Logs
-
-Very important for troubleshooting.
-
-```bash id="w6cmv4"
-cat /var/log/cloud-init-output.log
-```
-
----
-
-# 🔹 File Locations in Amazon Linux
-
-| Purpose       | Path                  |
-| ------------- | --------------------- |
-| Website files | /usr/share/nginx/html |
-| Config file   | /etc/nginx/nginx.conf |
-| Logs          | /var/log/nginx/       |
-
----
-
+**Welcome to Sunny’s EC2 Instance!**
