@@ -1,270 +1,100 @@
-# How to Install NGINX on Ubuntu Using EC2 User Data Script
+---
 
-## Step by Step with Example
-
-User Data in EC2 allows you to run commands automatically when instance starts.
-
-We will:
-
-✅ Launch Ubuntu EC2
-✅ Install NGINX automatically
-✅ Start NGINX service
-✅ Open website in browser
+# ✅ **How to Launch an EC2 Instance (Ubuntu AMI) with User Data Script**
 
 ---
 
-# 🔹 What is User Data?
+# **STEP 1: Login to AWS Console**
 
-When EC2 instance launches, AWS runs commands inside:
-
-```text id="lgfcde"
-User Data Script
-```
-
-Automatically on first boot.
-
-Used for:
-
-✅ Install software
-✅ Configure server
-✅ Deploy application
-✅ Start services
+Open EC2 → **Launch Instance**
 
 ---
 
-# 🔹 Final Goal
+# **STEP 2: Select AMI**
 
-After EC2 launches:
+In OS images, choose:
 
-```text id="k0ik3d"
-Ubuntu EC2
-→ NGINX installed automatically
-→ Website accessible from browser
-```
-
----
-
-# 🔹 Step 1: Open AWS EC2 Console
-
-Go to:
-
-AWS Console → EC2 → Instances
-
-Click:
-
-```text id="i7o9tx"
-Launch Instance
-```
-
----
-
-# 🔹 Step 2: Configure Instance
-
-## Name
-
-Example:
-
-```text id="hfz3ij"
-nginx-server
-```
-
----
-
-## AMI
-
-Choose:
-
-```text id="qok1su"
-Ubuntu Server 24.04 LTS
-```
-
----
-
-## Instance Type
-
-```text id="4jts3u"
-t2.micro
-```
+### ✔ **Ubuntu Server 22.04 LTS (Recommended)**
 
 (Free tier eligible)
 
 ---
 
-## Key Pair
+# **STEP 3: Select Instance Type**
 
-Choose existing key OR create new one.
+Choose:
 
-Example:
-
-```text id="ijrbzi"
-my-key.pem
-```
-
-Download key.
+### ✔ t2.micro (Free Tier)
 
 ---
 
-# 🔹 Step 3: Configure Security Group
+# **STEP 4: Key Pair**
 
-Allow:
-
-| Type | Port |
-| ---- | ---- |
-| SSH  | 22   |
-| HTTP | 80   |
-
-Very important.
+Create or use an existing key pair.
 
 ---
 
-# 🔹 Step 4: Add User Data Script
+# **STEP 5: Configure Network**
 
-Scroll to:
+- VPC: default
+- Subnet: any
+- Auto-assign Public IP: **enable**
+- Security Group:
+    - Allow **SSH (22)** — My IP
+    - Allow **HTTP (80)** — Anywhere (optional)
 
-```text id="1sw8sz"
-Advanced Details
+---
+
+# **STEP 6: Add User Data Script**
+
+Scroll to **Advanced details → User data**.
+
+Paste this script:
+
+---
+
+# ✔ **User Data Script for Ubuntu (NO Python/Node.js)**
+
 ```
-
-Find:
-
-```text id="cw4uws"
-User Data
-```
-
-Paste script:
-
-```bash id="0x4hmu"
 #!/bin/bash
-
 apt update -y
-apt install nginx -y
+apt install -y apache2
+systemctl enable apache2
+systemctl start apache2
 
-systemctl start nginx
-systemctl enable nginx
+echo "<h1>Welcome to Sunny's Ubuntu EC2 Instance!</h1>" > /var/www/html/index.html
 
-echo "<h1>NGINX Installed Using User Data</h1>" > /var/www/html/index.html
 ```
+
+This script will:
+
+✔ Update Ubuntu
+
+✔ Install Apache2
+
+✔ Start Apache
+
+✔ Deploy a simple HTML page
 
 ---
 
-# 🔹 What This Script Does
+# **STEP 7: Launch Instance**
 
-## Line 1
-
-```bash id="2h5wsf"
-#!/bin/bash
-```
-
-Tells Linux to use bash shell.
+Click **Launch Instance**.
 
 ---
 
-## Update Packages
+# **STEP 8: Test Your Server**
 
-```bash id="fjlwmr"
-apt update -y
+Copy the **Public IP** → open in browser:
+
+```
+http://YOUR_PUBLIC_IP
+
 ```
 
-Updates Ubuntu package list.
+You will see:
 
----
-
-## Install NGINX
-
-```bash id="t5t1q9"
-apt install nginx -y
-```
-
-Installs NGINX automatically.
-
----
-
-## Start Service
-
-```bash id="u8t59k"
-systemctl start nginx
-```
-
-Starts web server.
-
----
-
-## Enable on Boot
-
-```bash id="l0b5va"
-systemctl enable nginx
-```
-
-NGINX auto starts after reboot.
-
----
-
-## Create Website
-
-```bash id="8cft7y"
-echo "<h1>NGINX Installed Using User Data</h1>" > /var/www/html/index.html
-```
-
-Creates custom HTML page.
-
----
-
-# 🔹 Step 5: Launch Instance
-
-Click:
-
-```text id="b9y9zn"
-Launch Instance
-```
-
-Wait 1–2 minutes.
-
----
-
-# 🔹 Step 6: Open Website
-
-Copy EC2 public IP:
-
-Example:
-
-```text id="c8l2lp"
-http://54.xx.xx.xx
-```
-
-Browser output:
-
-```text id="zt8pku"
-NGINX Installed Using User Data
-```
-
-Success ✅
-
----
-
-# 🔹 Step 7: Verify Using SSH
-
-Connect:
-
-```bash id="0lf0w2"
-ssh -i my-key.pem ubuntu@PUBLIC-IP
-```
-
-Check NGINX:
-
-```bash id="mk33s8"
-systemctl status nginx
-```
-
----
-
-# 🔹 Check User Data Logs
-
-If script fails:
-
-```bash id="uhvnnf"
-cat /var/log/cloud-init-output.log
-```
-
-Very important for troubleshooting.
+**Welcome to Sunny’s Ubuntu EC2 Instance!**
 
 ---
