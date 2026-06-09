@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CloudVerse - AWS S3 Static Website</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      background:#f4f7ff;
+      overflow-x:hidden;
+    }
+
+    /* HEADER */
+
+    .header{
+      width:100%;
+      padding:25px 8%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:fixed;
+      top:0;
+      left:0;
+      z-index:1000;
+      background:rgba(0,0,0,0.15);
+      backdrop-filter:blur(10px);
+    }
+
+    .logo{
+      color:white;
+      font-size:30px;
+      font-weight:700;
+    }
+
+    .navbar a{
+      color:white;
+      text-decoration:none;
+      margin:0 18px;
+      font-weight:500;
+      transition:0.3s;
+    }
+
+    .navbar a:hover{
+      color:#66b3ff;
+    }
+
+    .header-btn{
+      text-decoration:none;
+      background:linear-gradient(90deg,#4f46e5,#9333ea);
+      color:white;
+      padding:14px 28px;
+      border-radius:50px;
+      font-weight:600;
+      transition:0.4s;
+    }
+
+    .header-btn:hover{
+      transform:translateY(-5px);
+    }
+
+    /* HERO SECTION */
+
+    .hero{
+      min-height:100vh;
+      background:linear-gradient(135deg,#020024,#090979,#6a00ff);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:140px 8%;
+      color:white;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:'';
+      position:absolute;
+      width:700px;
+      height:700px;
+      background:#9333ea;
+      filter:blur(180px);
+      right:-150px;
+      top:-150px;
+      opacity:0.5;
+    }
+
+    .hero-left{
+      width:50%;
+      z-index:2;
+    }
+
+    .tag{
+      display:inline-block;
+      background:rgba(255,255,255,0.12);
+      padding:12px 22px;
+      border-radius:50px;
+      margin-bottom:30px;
+      font-size:14px;
+      font-weight:600;
+      border:1px solid rgba(255,255,255,0.2);
+    }
+
+    .hero-left h1{
+      font-size:72px;
+      line-height:1.2;
+      margin-bottom:25px;
+      font-weight:800;
+    }
+
+    .hero-left h1 span{
+      color:#66b3ff;
+    }
+
+    .hero-left p{
+      color:#d1d5db;
+      line-height:2;
+      font-size:18px;
+      margin-bottom:40px;
+    }
+
+    .hero-buttons{
+      display:flex;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:16px 34px;
+      border-radius:50px;
+      text-decoration:none;
+      font-weight:600;
+      transition:0.4s;
+    }
+
+    .primary-btn{
+      background:linear-gradient(90deg,#3b82f6,#9333ea);
+      color:white;
+    }
+
+    .secondary-btn{
+      border:1px solid rgba(255,255,255,0.2);
+      color:white;
+      background:rgba(255,255,255,0.08);
+    }
+
+    .btn:hover{
+      transform:translateY(-5px);
+    }
+
+    /* RIGHT SIDE */
+
+    .hero-right{
+      width:45%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .cloud-box{
+      width:420px;
+      height:420px;
+      background:rgba(255,255,255,0.08);
+      border-radius:50%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 0 80px rgba(147,51,234,0.4);
+      animation:float 4s ease-in-out infinite;
+    }
+
+    .cloud{
+      width:250px;
+      height:250px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#66b3ff,#9333ea);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:80px;
+      font-weight:700;
+      text-transform:uppercase;
+      box-shadow:0 0 40px rgba(255,255,255,0.3);
+    }
+
+    @keyframes float{
+      0%{
+        transform:translateY(0px);
+      }
+      50%{
+        transform:translateY(-20px);
+      }
+      100%{
+        transform:translateY(0px);
+      }
+    }
+
+    /* COMMON SECTION */
+
+    section{
+      padding:120px 8%;
+    }
+
+    .section-header{
+      text-align:center;
+      margin-bottom:70px;
+    }
+
+    .section-header span{
+      color:#7c3aed;
+      font-weight:700;
+      letter-spacing:2px;
+    }
+
+    .section-header h2{
+      font-size:48px;
+      margin-top:15px;
+      color:#111827;
+    }
+
+    /* FEATURES */
+
+    .features-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:30px;
+    }
+
+    .card{
+      background:white;
+      padding:40px 30px;
+      border-radius:25px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+      transition:0.4s;
+    }
+
+    .card:hover{
+      transform:translateY(-12px);
+    }
+
+    .icon{
+      font-size:45px;
+      margin-bottom:20px;
+    }
+
+    .card h3{
+      margin-bottom:15px;
+      color:#111827;
+    }
+
+    .card p{
+      color:#6b7280;
+      line-height:1.8;
+    }
+
+    /* ABOUT */
+
+    .about-section{
+      background:#ffffff;
+    }
+
+    .about-content{
+      max-width:900px;
+      margin:auto;
+      text-align:center;
+    }
+
+    .about-content p{
+      font-size:18px;
+      line-height:2;
+      color:#6b7280;
+    }
+
+    /* FOOTER */
+
+    footer{
+      background:#020617;
+      color:white;
+      text-align:center;
+      padding:40px 20px;
+    }
+
+    footer p{
+      color:#cbd5e1;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:991px){
+
+      .hero{
+        flex-direction:column;
+        text-align:center;
+        padding-top:180px;
+      }
+
+      .hero-left{
+        width:100%;
+      }
+
+      .hero-right{
+        width:100%;
+        margin-top:70px;
+      }
+
+      .hero-buttons{
+        justify-content:center;
+      }
+
+      .hero-left h1{
+        font-size:52px;
+      }
+
+      .navbar{
+        display:none;
+      }
+
+    }
+
+    @media(max-width:600px){
+
+      .hero-left h1{
+        font-size:40px;
+      }
+
+      .section-header h2{
+        font-size:34px;
+      }
+
+      .cloud-box{
+        width:300px;
+        height:300px;
+      }
+
+      .cloud{
+        width:180px;
+        height:180px;
+        font-size:50px;
+      }
+
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+
+  <header class="header">
+
+    <div class="logo">
+      ☁ CloudVerse
+    </div>
+
+    <nav class="navbar">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#benefits">S3 Benefits</a>
+      <a href="#usecases">Use Cases</a>
+    </nav>
+
+    <a href="https://aws.amazon.com/s3/"
+       target="_blank"
+       class="header-btn">
+       Learn AWS S3
+    </a>
+
+  </header>
+
+  <!-- HERO -->
+
+  <section class="hero" id="home">
+
+    <div class="hero-left">
+
+      <span class="tag">
+        🚀 AWS S3 STATIC WEBSITE HOSTING
+      </span>
+
+      <h1>
+        Host Powerful Websites <br>
+        with <span>AWS S3</span>
+      </h1>
+
+      <p>
+        Amazon S3 provides highly scalable object storage for static website hosting,
+        backup storage, lifecycle management, encryption, versioning, and secure cloud storage.
+      </p>
+
+      <div class="hero-buttons">
+
+        <a href="#features" class="btn primary-btn">
+          Explore Features
+        </a>
+
+        <a href="https://aws.amazon.com/s3/"
+           target="_blank"
+           class="btn secondary-btn">
+          View on AWS
+        </a>
+
+      </div>
+
+    </div>
+
+    <div class="hero-right">
+
+      <div class="cloud-box">
+
+        <div class="cloud">
+          aws
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- FEATURES -->
+
+  <section class="features-section" id="features">
+
+    <div class="section-header">
+
+      <span>POWERFUL CAPABILITIES</span>
+
+      <h2>AWS S3 Features</h2>
+
+    </div>
+
+    <div class="features-grid">
+
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3>Static Website Hosting</h3>
+        <p>
+          Host fast and scalable static websites directly from Amazon S3.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>Secure Storage</h3>
+        <p>
+          S3 provides IAM policies, encryption, and bucket security.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">♻</div>
+        <h3>Versioning</h3>
+        <p>
+          Protect files from accidental deletion or overwrite.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>High Durability</h3>
+        <p>
+          S3 offers industry-leading durability and availability.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Lifecycle Management</h3>
+        <p>
+          Automatically move files between storage classes.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon">☁</div>
+        <h3>Serverless</h3>
+        <p>
+          No servers to manage. Fully cloud-native architecture.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ABOUT -->
+
+  <section class="about-section" id="about">
+
+    <div class="section-header">
+      <span>ABOUT AMAZON S3</span>
+      <h2>Reliable Cloud Object Storage</h2>
+    </div>
+
+    <div class="about-content">
+
+      <p>
+        Amazon S3 is a scalable object storage service used for
+        static website hosting, backup storage, disaster recovery,
+        cloud-native applications, media hosting, and secure file storage.
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- BENEFITS -->
+
+  <section class="benefits-section" id="benefits">
+
+    <div class="section-header">
+      <span>WHY USE AMAZON S3</span>
+      <h2>S3 Benefits</h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="card">
+        <div class="icon">💸</div>
+        <h3>Cost Effective</h3>
+        <p>Pay only for storage you use with no upfront cost.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🌍</div>
+        <h3>Global Access</h3>
+        <p>Access your data securely from anywhere worldwide.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>Fast Performance</h3>
+        <p>Optimized infrastructure for low latency and fast delivery.</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- USE CASES -->
+
+  <section class="usecases-section" id="usecases">
+
+    <div class="section-header">
+      <span>REAL WORLD APPLICATIONS</span>
+      <h2>Amazon S3 Use Cases</h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3>Static Website Hosting</h3>
+        <p>Host portfolio and company websites on AWS S3.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🎥</div>
+        <h3>Media Storage</h3>
+        <p>Store videos, images, and application assets securely.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">💾</div>
+        <h3>Backup & Recovery</h3>
+        <p>Use S3 for backup, snapshots, and disaster recovery.</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <p>
+      AWS S3 Static Website Hosting Project | CloudVerse © 2026
+    </p>
+
+  </footer>
+
+</body>
+</html>
